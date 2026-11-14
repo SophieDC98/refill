@@ -82,4 +82,6 @@ export function renderSettings(root, settings, notifState, { onChange, onDone, o
     }
   };
   showNotif(notifState);
+  // Another open copy saved new settings: show them in the fields, as an edit would.
+  return { update(next) { current = next; show(); } };
 }

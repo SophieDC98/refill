@@ -35,6 +35,12 @@ notice.textContent = "Can't save on this browser \u2014 counts will be lost when
 notice.hidden = usable;
 windowEl.append(notice);
 
+// A stable live region: the tracker is redrawn on every change, so only this text is updated.
+const live = document.createElement("div");
+live.className = "sr-only";
+live.setAttribute("aria-live", "polite");
+windowEl.append(live);
+
 const state = { ...load(storage), view: "today", fixing: null };
 let today = dateKey(new Date());
 const todayKey = () => today;
@@ -60,7 +66,10 @@ function focusTarget() {
 window.addEventListener("storage", (e) => {
   if (e.storageArea !== storage || (e.key !== null && e.key !== STORAGE_KEY)) return;
   Object.assign(state, load(storage));
-  if (state.view !== "today") return; // settings are redrawn when Sophie taps Done
+  if (state.view === "settings") {
+    settingsView?.update(state.settings);
+    return;
+  }
   const target = focusTarget();
   render();
   if (target) root.querySelector(target)?.focus();
@@ -97,9 +106,11 @@ function onChangeSettings(settings) {
   persist();
 }
 
+let settingsView = null;
+
 function render() {
   if (state.view === "settings") {
-    renderSettings(root, state.settings, notificationState(), {
+    settingsView = renderSettings(root, state.settings, notificationState(), {
       onChange: onChangeSettings,
       onDone() { state.view = "today"; render(); },
       onEnableNotifications: askPermission,
@@ -124,6 +135,8 @@ function render() {
       onOpenSettings() { state.view = "settings"; render(); },
     },
   );
+  const n = countOn(state.days, key);
+  live.textContent = `${n} ${n === 1 ? "bottle" : "bottles"} logged, goal ${goal(state.settings)}`;
   renderCalendar(
     calendarRoot,
     { ...state.shown, days: state.days, todayKey: todayKey(), selectedKey: key, bottleCl: state.settings.bottleCl },

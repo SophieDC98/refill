@@ -44,7 +44,7 @@ export function renderTracker(root, { key, isToday, count, settings }, { onTap, 
     `<div class="head"><h2>refill</h2><button type="button" class="iconbtn" id="openSettings">&#9881; Settings</button></div>` +
     daybar +
     `<div class="bottles" id="bottles">${bottles}</div>` +
-    `<div class="total" aria-live="polite"><span class="big">${count} of ${g}</span><span class="sub">${litres(count, settings.bottleCl).toFixed(1)} L · ${settings.bottleCl}cl bottles</span></div>`;
+    `<div class="total"><span class="big">${count} of ${g}</span><span class="sub">${litres(count, settings.bottleCl).toFixed(1)} L · ${settings.bottleCl}cl bottles</span></div>`;
 
   root.querySelector("#openSettings").onclick = onOpenSettings;
   const back = root.querySelector("#backToday");
