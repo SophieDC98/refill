@@ -11,3 +11,6 @@ at most once a day: the flags are stored with the date they belong to, so a new
 day starts them clear and a reload does not repeat a reminder. The morning check
 is marked fired even when the morning part is already done, so it stays silent
 for the rest of the window.
+
+A reminder whose time passes while notifications are off or not allowed counts
+as fired for the day: switching notifications on later does not replay it.

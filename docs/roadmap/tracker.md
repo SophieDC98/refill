@@ -14,6 +14,7 @@ Nothing.
 
 The design in `docs/superpowers/specs/2026-11-14-refill-design.md`, built from
 the plan in `docs/superpowers/plans/2026-11-14-refill.md`.
+Decisions: [Storage](../adr/storage.md), [Platform](../adr/platform.md).
 
 ## Progress
 

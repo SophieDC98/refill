@@ -17,5 +17,6 @@ in the page, the manifest and the service worker is relative.
 cache-first, so the installed app opens offline. The Google Fonts are not
 cached; offline the page uses system fonts. A new worker takes over on the next
 load (`skipWaiting` on install, `clients.claim` on activate) and deletes older
-caches. The cache name must be bumped (`refill-v1`, `refill-v2`, ...) whenever
+caches. Every precache request bypasses the HTTP cache (`cache: "reload"`), so a
+new worker never stores stale files. The cache name must be bumped (`refill-v2`, `refill-v3`, ...) whenever
 a cached file changes, or installed copies keep the old files.

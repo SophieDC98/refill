@@ -14,6 +14,7 @@ The morning check and the day total, shown as Windows notifications while refill
 
 The design in `docs/superpowers/specs/2026-11-14-refill-design.md`, built from
 the plan in `docs/superpowers/plans/2026-11-14-refill.md`.
+Decisions: [Reminders](../adr/reminders.md).
 
 ## Progress
 
