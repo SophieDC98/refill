@@ -152,3 +152,5 @@ button { cursor: pointer; }
 .legend { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
 .legend .sw { display: flex; gap: 2px; }
 .legend .sw i { width: 12px; height: 12px; border: 2px solid var(--line); box-sizing: border-box; }
+.legend .hint { margin-left: auto; }
+.cell:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }

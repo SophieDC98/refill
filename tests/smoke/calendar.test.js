@@ -97,3 +97,30 @@ test("calendar: fixing a day changes only that day, back returns to today", asyn
   assert.deepEqual(errors, []);
   await context.close();
 });
+
+test("calendar: focus stays on the arrow pressed; today is marked; focused cells have a ring", async () => {
+  const { context, page, errors } = await open({ "2026-09-10": 1, "2026-11-02": 1 });
+  const active = () => page.evaluate(() => document.activeElement.className);
+  await page.locator(".calnav .prev").click();
+  await page.getByText("October 2026").waitFor();
+  assert.equal(await active(), "prev");
+  await page.locator(".calnav .next").click();
+  await page.getByText("November 2026").waitFor();
+  // › is now disabled on the current month, so focus moves to ‹
+  assert.equal(await active(), "prev");
+  await page.locator(".calnav .prev").click();
+  await page.locator(".calnav .prev").click();
+  await page.getByText("September 2026").waitFor();
+  await page.locator(".calnav .next").click();
+  await page.getByText("October 2026").waitFor();
+  assert.equal(await active(), "next");
+
+  await page.locator(".calnav .next").click();
+  assert.equal(await page.locator('.cell[aria-current="date"]').getAttribute("data-k"), "2026-11-18");
+  await page.keyboard.press("Tab");
+  await page.locator('.cell[data-k="2026-11-18"]').focus();
+  const outline = await page.locator('.cell[data-k="2026-11-18"]').evaluate((el) => getComputedStyle(el).outlineWidth);
+  assert.equal(outline, "3px");
+  assert.deepEqual(errors, []);
+  await context.close();
+});

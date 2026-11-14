@@ -29,9 +29,10 @@ export function renderCalendar(root, { year, month, days, todayKey, selectedKey,
       continue;
     }
     const n = countOn(days, key);
+    const current = key === todayKey ? ' aria-current="date"' : "";
     const cls = `cell s${shade(n, bottleCl)}${key === todayKey ? " today" : ""}${key === selectedKey && key !== todayKey ? " sel" : ""}`;
     const label = `${d} ${MONTHS[month].slice(0, 3)}: ${n} ${n === 1 ? "bottle" : "bottles"}, ${litres(n, bottleCl).toFixed(1)} L`;
-    cells += `<button type="button" class="${cls}" data-k="${key}" aria-label="${label}">${d}</button>`;
+    cells += `<button type="button" class="${cls}" data-k="${key}"${current} aria-label="${label}">${d}</button>`;
   }
 
   root.innerHTML =
@@ -41,11 +42,16 @@ export function renderCalendar(root, { year, month, days, todayKey, selectedKey,
     `<button type="button" class="next" aria-label="Next month"${canNext ? "" : " disabled"}>&#8250;</button></div></div>` +
     `<div class="grid">${cells}</div>` +
     `<div class="legend"><span>0 L</span><span class="sw">${[0, 1, 2, 3, 4].map((i) => `<i style="background:var(--shade-${i})"></i>`).join("")}</span>` +
-    `<span>2 L+</span><span style="margin-left:auto">Tap a day to fix it</span></div></section>`;
+    `<span>2 L+</span><span class="hint">Tap a day to fix it</span></div></section>`;
 
   const focusAfter = (selector) => root.querySelector(selector)?.focus();
-  root.querySelector(".prev").onclick = () => { onMonth(-1); focusAfter(".prev:not(:disabled), .next"); };
-  root.querySelector(".next").onclick = () => { onMonth(1); focusAfter(".next:not(:disabled), .prev"); };
+  // The calendar is redrawn on every click; keep focus on the arrow pressed, or the other one if it became disabled.
+  const focusArrow = (pressed, other) => {
+    const el = root.querySelector(pressed);
+    (el && !el.disabled ? el : root.querySelector(other))?.focus();
+  };
+  root.querySelector(".prev").onclick = () => { onMonth(-1); focusArrow(".prev", ".next"); };
+  root.querySelector(".next").onclick = () => { onMonth(1); focusArrow(".next", ".prev"); };
   root.querySelector(".grid").onclick = (e) => {
     const button = e.target.closest(".cell[data-k]");
     if (!button) return;
