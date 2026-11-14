@@ -20,3 +20,4 @@ it to find which decisions bear on a piece of work.
 
 - [Platform](platform.md) a static browser app installed from Edge, hosted on GitHub Pages, no build step.
 - [Storage](storage.md) one versioned JSON document in `localStorage`, days as `{ date: count }`.
+- [Reminders](reminders.md) the open page checks the clock; weekdays only, a 60-minute late window, each reminder once a day.
