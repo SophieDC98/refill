@@ -29,6 +29,18 @@ Your data stays in the browser's localStorage.
   them, Settings says so. After midnight the app moves on to the new day by
   itself.
 
+## Install it
+
+1. Open https://sophiedc98.github.io/refill/ in Edge.
+2. Choose ⋯ → Apps → Install this site as an app. refill then opens in its own
+   window and works offline.
+3. Allow notifications for the site in Edge's settings, then turn them on in
+   the app's Settings.
+4. Optional: to start it at sign-in, open edge://apps, pick refill and turn on
+   "Start app at sign-in".
+
+If installing is blocked, pin the browser tab instead.
+
 ## Run it locally
 
 - `npm run serve` serves the app; open http://localhost:8000.

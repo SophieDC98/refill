@@ -114,3 +114,8 @@ function tick() {
 setInterval(tick, 30 * 1000);
 document.addEventListener("visibilitychange", tick);
 tick();
+
+// Offline and installable; a failed registration just leaves the app online-only.
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
