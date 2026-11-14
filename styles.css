@@ -1,0 +1,110 @@
+:root {
+  --bg: #eef3f8;
+  --surface: #ffffff;
+  --fg: #16253a;
+  --muted: #5b6b80;
+  --line: #d5dee9;
+  --accent: #2f6fb8;
+  --accent-ink: #ffffff;
+  --chrome: #e3eaf2;
+
+  /* pixel bottle */
+  --px-out: #7a90ab;
+  --px-cap: #1d2a5c;
+  --px-capd: #34488f;
+  --px-glass: #f1f6fb;
+  --px-glasshi: #ffffff;
+  --px-water: #a9d4f5;
+  --px-watertop: #d2eafb;
+  --px-waterhi: #e3f2fd;
+  --px-lab: #ffffff;
+  --px-labd: #283c86;
+  --star: #ffd23f;
+  --star-d: #f2a900;
+
+  /* history shades: nothing -> a lot */
+  --shade-0: #ffffff;
+  --shade-1: #d6e8f7;
+  --shade-2: #9cc7ec;
+  --shade-3: #4d8fd1;
+  --shade-4: #17407a;
+  --shade-ink-dark: #16253a;
+  --shade-ink-light: #ffffff;
+
+  --font-display: "Pixelify Sans", "Courier New", monospace;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1722; --surface: #172231; --fg: #e4ecf5; --muted: #93a4b8; --line: #2a3a4e;
+    --accent: #5aa2ec; --accent-ink: #0b1420; --chrome: #1d2a3b;
+    --px-out: #9fb6cf; --px-cap: #4a5fae; --px-capd: #6f84cf; --px-glass: #22324a; --px-glasshi: #2e4260;
+    --px-water: #4f9ae6; --px-watertop: #7fb8f0; --px-waterhi: #79b3ee; --px-lab: #dce8f5; --px-labd: #3a52a8;
+    --star: #ffd84d; --star-d: #f2a900;
+    --shade-0: #1e2b3b; --shade-1: #1f3d60; --shade-2: #255a90; --shade-3: #3277c0; --shade-4: #5aa2ec;
+    --shade-ink-dark: #e4ecf5; --shade-ink-light: #0b1420;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1722; --surface: #172231; --fg: #e4ecf5; --muted: #93a4b8; --line: #2a3a4e;
+  --accent: #5aa2ec; --accent-ink: #0b1420; --chrome: #1d2a3b;
+  --px-out: #9fb6cf; --px-cap: #4a5fae; --px-capd: #6f84cf; --px-glass: #22324a; --px-glasshi: #2e4260;
+  --px-water: #4f9ae6; --px-watertop: #7fb8f0; --px-waterhi: #79b3ee; --px-lab: #dce8f5; --px-labd: #3a52a8;
+  --star: #ffd84d; --star-d: #f2a900;
+  --shade-0: #1e2b3b; --shade-1: #1f3d60; --shade-2: #255a90; --shade-3: #3277c0; --shade-4: #5aa2ec;
+  --shade-ink-dark: #e4ecf5; --shade-ink-light: #0b1420;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 14px; line-height: 1.45;
+  margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* the window: one small column, centred on wider screens */
+.window { position: relative; width: 360px; max-width: 100%; margin: 0 auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 30px rgba(22,37,58,.12); overflow: hidden; }
+.app { padding: 16px; display: flex; flex-direction: column; gap: 18px; }
+
+.head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.head h2 { font-family: var(--font-display); font-weight: 600; font-size: 24px; margin: 0; letter-spacing: .03em; }
+.iconbtn { border: 1px solid var(--line); background: transparent; border-radius: 6px; padding: 4px 10px; font-size: 13px; }
+.iconbtn:hover { background: var(--chrome); }
+
+.daybar { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); }
+.daybar.editing { background: var(--chrome); border-radius: 6px; padding: 6px 8px; color: var(--fg); }
+.linkbtn { background: none; border: none; color: var(--accent); padding: 0; font-weight: 600; font-size: 13px; }
+
+.bottles { display: flex; flex-wrap: wrap; gap: 10px 8px; justify-content: center; }
+.group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.group .row { display: flex; gap: 2px; }
+.group .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.bottle { background: none; border: none; padding: 1px; border-radius: 4px; line-height: 0; }
+.bottle svg { width: 28px; height: 64px; display: block; shape-rendering: crispEdges; image-rendering: pixelated; }
+.bottle:hover svg { transform: translateY(-2px); }
+.bottle.pop svg { animation: pop .28s steps(3); }
+.bottle.ghost svg { opacity: .35; }
+@keyframes pop { 50% { transform: translateY(-5px); } }
+@media (prefers-reduced-motion: reduce) { .bottle.pop svg { animation: none; } .bottle:hover svg { transform: none; } }
+
+.total { text-align: center; display: flex; flex-direction: column; gap: 2px; }
+.total .big { font-family: var(--font-display); font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+.total .sub { color: var(--muted); font-size: 13px; }
+
+.p-out{fill:var(--px-out)} .p-cap{fill:var(--px-cap)} .p-capd{fill:var(--px-capd)}
+.p-glass{fill:var(--px-glass)} .p-glasshi{fill:var(--px-glasshi)}
+.p-water{fill:var(--px-water)} .p-watertop{fill:var(--px-watertop)} .p-waterhi{fill:var(--px-waterhi)}
+.p-lab{fill:var(--px-lab)} .p-labd{fill:var(--px-labd)}
+.p-star{fill:var(--star)} .p-stard{fill:var(--star-d)}
+
+/* goal stars */
+.burst { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
+.burst span { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; line-height: 0; }
+.burst svg { width: 100%; height: 100%; shape-rendering: crispEdges; }
+
