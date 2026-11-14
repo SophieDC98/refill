@@ -15,7 +15,7 @@ nothing is fetched from other sites.
   reaching the goal.
 - Shows a month calendar below the bottles, one blocky square per day, shaded
   by how much you drank (0 L up to 2 L+). Step back and forward through the
-  months with the arrows.
+  months with the arrows, as far back as September 2026.
 - Tap a past day to fix it: the bottles show that day, with a "Fixing" bar,
   and tapping a bottle changes only that day. "Back to today" (or tapping
   today) returns.
