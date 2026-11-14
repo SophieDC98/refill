@@ -1,6 +1,6 @@
 # Tracker
 
-Status: not started.
+Status: done.
 
 ## What it builds
 
@@ -33,3 +33,9 @@ the plan in `docs/superpowers/plans/2026-11-14-refill.md`.
   smoke test drives it in a real browser. Review found the test failed
   without internet (the page loads its font from Google), fixed by blocking
   the font in tests.
+- **Task 4, settings** (`a08f956`, `856dd91`). The settings view: the
+  schedule's parts, daily goal, bottle size, and both reminders' times and
+  switches, kept in step and saved. Smoke tests cover clamping, lowering the
+  goal below what's logged, and settings surviving a reload. Review found
+  keyboard focus was lost after each change and three tests skipped the
+  error check; both fixed.
