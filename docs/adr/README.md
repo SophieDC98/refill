@@ -15,3 +15,7 @@ remembering, and the consequences only when they are not obvious.
 
 The list below groups the topics by area, one line each. It is the map: read
 it to find which decisions bear on a piece of work.
+
+## Platform
+
+- [Platform](platform.md) a static browser app installed from Edge, hosted on GitHub Pages, no build step.

@@ -43,4 +43,6 @@ it built is marked `built`, any choice made on the way is in its decision, and
 
 ## Build and run
 
-None yet.
+- `npm test` runs the unit tests.
+- `npm run test:smoke` runs the smoke tests.
+- `npm run serve` serves the app; open http://localhost:8000.
