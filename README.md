@@ -12,6 +12,12 @@ Your data stays in the browser's localStorage.
 - Shows "N of G" and the litres, and how many are left to go.
 - Past the daily goal it adds an extra bottle, and a burst of stars marks
   reaching the goal.
+- Shows a month calendar below the bottles, one blocky square per day, shaded
+  by how much you drank (0 L up to 2 L+). Step back and forward through the
+  months with the arrows.
+- Tap a past day to fix it: the bottles show that day, with a "Fixing" bar,
+  and tapping a bottle changes only that day. "Back to today" (or tapping
+  today) returns.
 - Settings: the bottles in each part, the daily goal (changing it adds or
   removes bottles in the afternoon), the bottle size, and the morning check and
   day total reminders (on or off, and the time). Lowering the goal never

@@ -72,6 +72,7 @@ button { cursor: pointer; }
 .window { position: relative; width: 360px; max-width: 100%; margin: 0 auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 30px rgba(22,37,58,.12); overflow: hidden; }
 .app { padding: 16px; display: flex; flex-direction: column; gap: 18px; }
 
+.part { display: flex; flex-direction: column; gap: 18px; }
 .head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .head h2 { font-family: var(--font-display); font-weight: 600; font-size: 24px; margin: 0; letter-spacing: .03em; }
 .iconbtn { border: 1px solid var(--line); background: transparent; border-radius: 6px; padding: 4px 10px; font-size: 13px; }
@@ -128,3 +129,26 @@ button { cursor: pointer; }
 .switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
 .note { font-size: 12px; color: var(--muted); margin: 0; }
 .primary { background: var(--accent); color: var(--accent-ink); border: none; border-radius: 6px; padding: 7px 12px; font-weight: 600; }
+
+/* calendar: blocky pixel grid */
+.cal { border-top: 2px dashed var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.calhead { display: flex; align-items: center; justify-content: space-between; }
+.calhead h3 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 17px; }
+.calnav { display: flex; gap: 4px; }
+.calnav button { border: 2px solid var(--line); background: transparent; border-radius: 0; width: 30px; height: 28px; font-family: var(--font-display); box-shadow: 2px 2px 0 var(--line); }
+.calnav button:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: none; }
+.calnav button:disabled { opacity: .35; cursor: default; }
+.grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.dow { font-family: var(--font-display); font-size: 12px; color: var(--muted); text-align: center; }
+.cell { aspect-ratio: 1; max-width: 100%; min-width: 0; border-radius: 0; border: 2px solid var(--line); background: var(--shade-0); display: flex; align-items: flex-start; justify-content: flex-start; padding: 2px 4px; font-family: var(--font-display); font-size: 12px; font-variant-numeric: tabular-nums; color: var(--shade-ink-dark); box-shadow: inset -3px -3px 0 rgba(22,37,58,.06); }
+.cell.s1 { background: var(--shade-1); border-color: var(--shade-1); box-shadow: inset -3px -3px 0 rgba(22,37,58,.1); }
+.cell.s2 { background: var(--shade-2); border-color: var(--shade-2); box-shadow: inset -3px -3px 0 rgba(22,37,58,.12); }
+.cell.s3 { background: var(--shade-3); border-color: var(--shade-3); color: var(--shade-ink-light); box-shadow: inset -3px -3px 0 rgba(0,0,0,.16); }
+.cell.s4 { background: var(--shade-4); border-color: var(--shade-4); color: var(--shade-ink-light); box-shadow: inset -3px -3px 0 rgba(0,0,0,.2); }
+.cell.future { background: transparent; border-style: dashed; color: var(--muted); cursor: default; box-shadow: none; }
+.cell.today { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cell.sel { outline: 2px solid var(--fg); outline-offset: 2px; }
+.cell.blank { visibility: hidden; }
+.legend { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+.legend .sw { display: flex; gap: 2px; }
+.legend .sw i { width: 12px; height: 12px; border: 2px solid var(--line); box-sizing: border-box; }
