@@ -59,20 +59,28 @@ test("calendar: shades, weekends, future days, month navigation", async () => {
   await page.locator(".calnav .prev").click();
   await page.getByText("October 2026").waitFor();
   assert.equal(await cell(page, "2026-10-20").count(), 1);
-  assert.equal(await page.locator(".calnav .prev").isDisabled(), true); // earliest logged day is in October
+  assert.equal(await page.locator(".calnav .prev").isDisabled(), false); // history reaches back to September 2026
+  await page.locator(".calnav .prev").click();
+  await page.getByText("September 2026").waitFor();
+  assert.equal(await page.locator(".calnav .prev").isDisabled(), true);
+  await page.locator(".calnav .next").click();
   await page.locator(".calnav .next").click();
   await page.getByText("November 2026").waitFor();
   assert.deepEqual(errors, []);
   await context.close();
 });
 
-test("calendar: with nothing logged, one month back is allowed and no further", async () => {
+test("calendar: with nothing logged, it goes back to September 2026 and no further", async () => {
   const { context, page, errors } = await open({});
   assert.equal(await page.locator(".calnav .prev").isDisabled(), false);
   assert.equal(await page.locator(".calnav .next").isDisabled(), true);
   await page.locator(".calnav .prev").click();
   await page.getByText("October 2026").waitFor();
+  await page.locator(".calnav .prev").click();
+  await page.getByText("September 2026").waitFor();
   assert.equal(await page.locator(".calnav .prev").isDisabled(), true);
+  await cell(page, "2026-09-01").click(); // a September day can be fixed
+  await page.getByText("Fixing").waitFor();
   assert.deepEqual(errors, []);
   await context.close();
 });

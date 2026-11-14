@@ -6,12 +6,16 @@ const DOW = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 const monthIndex = (year, month) => year * 12 + month;
 const keyOf = (y, m, d) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
+// Sophie wants to fill in her history from September 2026 onwards.
+const HISTORY_START = monthIndex(2026, 8);
+
 function earliestMonth(days, todayKey) {
   const logged = Object.keys(days).filter((k) => days[k] > 0).sort();
   const monthOf = (key) => monthIndex(Number(key.slice(0, 4)), Number(key.slice(5, 7)) - 1);
-  // Always one month back, so an empty history can still be looked at and a forgotten day fixed.
+  // Always at least one month back, so a forgotten day can be fixed across a month edge.
   const previous = monthOf(todayKey) - 1;
-  return logged[0] ? Math.min(monthOf(logged[0]), previous) : previous;
+  const earliest = Math.min(previous, HISTORY_START);
+  return logged[0] ? Math.min(monthOf(logged[0]), earliest) : earliest;
 }
 
 export function renderCalendar(root, { year, month, days, todayKey, selectedKey, bottleCl }, { onPick, onMonth }) {
