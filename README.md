@@ -42,6 +42,24 @@ nothing is fetched from other sites.
 
 If installing is blocked, pin the browser tab instead.
 
+## Reinstall it
+
+Do this when Windows keeps showing an old taskbar icon after an update. Your
+counts and settings stay, as long as you leave "clear data" unticked.
+
+1. Uninstall: in the refill window, open ⋯ (top right) → App settings →
+   Uninstall. Or open edge://apps in Edge, click ⋯ next to refill and choose
+   Uninstall. Or use Windows Settings → Apps → Installed apps → refill →
+   Uninstall.
+2. When asked, leave "Also clear data from Microsoft Edge" **unticked**.
+   Ticking it deletes your history.
+3. If you pinned refill to the taskbar, right-click its old icon and choose
+   "Unpin from taskbar".
+4. Install again: open https://sophiedc98.github.io/refill/ in Edge and choose
+   ⋯ → Apps → Install this site as an app.
+5. Pin it again: right-click refill in the taskbar and choose "Pin to
+   taskbar". To start it at sign-in, turn that on again in edge://apps.
+
 ## Run it locally
 
 - `npm run serve` serves the app; open http://localhost:8000.
