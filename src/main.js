@@ -1,4 +1,4 @@
-import { load, save } from "./core/storage.js";
+import { load, save, STORAGE_KEY } from "./core/storage.js";
 import { dueReminders } from "./core/reminders.js";
 import { notificationState, askPermission, showReminder } from "./notify.js";
 import { dateKey, countOn, tapBottle, reachedGoal } from "./core/days.js";
@@ -11,21 +11,65 @@ import { burst } from "./ui/stars.js";
 const windowEl = document.getElementById("window");
 const root = document.getElementById("app");
 
-const state = { ...load(localStorage), view: "today", editing: null };
+// Some browsers block site data and throw on the localStorage global itself.
+// Then the app runs from memory and says so.
+function openStorage() {
+  try {
+    const storage = window.localStorage;
+    storage.getItem(STORAGE_KEY);
+    return { storage, usable: true };
+  } catch {
+    const map = new Map();
+    return {
+      storage: { getItem: (k) => map.get(k) ?? null, setItem: (k, v) => map.set(k, String(v)) },
+      usable: false,
+    };
+  }
+}
+const { storage, usable } = openStorage();
+
+const notice = document.createElement("p");
+notice.className = "storage-notice";
+notice.setAttribute("role", "status");
+notice.textContent = "Can't save on this browser \u2014 counts will be lost when refill closes.";
+notice.hidden = usable;
+windowEl.append(notice);
+
+const state = { ...load(storage), view: "today", fixing: null };
 let today = dateKey(new Date());
 const todayKey = () => today;
-state.editing = today;
+state.fixing = today;
 const now = new Date();
 state.shown = { year: now.getFullYear(), month: now.getMonth() };
 
 function persist() {
-  save(localStorage, state);
+  notice.hidden = save(storage, state) && usable;
 }
 
+// Another open copy of refill saved: take its data, keep the view and the day being fixed.
+function focusTarget() {
+  const el = document.activeElement;
+  if (!el || !root.contains(el)) return null;
+  for (const attr of ["data-i", "data-k", "id", "class"]) {
+    const value = el.getAttribute(attr);
+    if (value) return attr === "id" ? `#${value}` : attr === "class" ? `.${value.split(" ")[0]}` : `[${attr}="${value}"]`;
+  }
+  return null;
+}
+
+window.addEventListener("storage", (e) => {
+  if (e.storageArea !== storage || (e.key !== null && e.key !== STORAGE_KEY)) return;
+  Object.assign(state, load(storage));
+  if (state.view !== "today") return; // settings are redrawn when Sophie taps Done
+  const target = focusTarget();
+  render();
+  if (target) root.querySelector(target)?.focus();
+});
+
 function onTap(index) {
-  const before = countOn(state.days, state.editing);
-  state.days = tapBottle(state.days, state.editing, index);
-  const after = countOn(state.days, state.editing);
+  const before = countOn(state.days, state.fixing);
+  state.days = tapBottle(state.days, state.fixing, index);
+  const after = countOn(state.days, state.fixing);
   persist();
   render();
   if (reachedGoal(before, after, goal(state.settings))) burst(windowEl, root.querySelector("#bottles"));
@@ -36,7 +80,7 @@ function showMonthOf(key) {
 }
 
 function onPick(key) {
-  state.editing = key;
+  state.fixing = key;
   showMonthOf(key);
   render();
 }
@@ -62,7 +106,7 @@ function render() {
     });
     return;
   }
-  const key = state.editing;
+  const key = state.fixing;
   // Tracker and calendar each own a container, so one can be redrawn (and keep focus) without the other.
   let trackerRoot = root.querySelector("#tracker");
   let calendarRoot = root.querySelector("#calendar");
@@ -76,7 +120,7 @@ function render() {
     { key, isToday: key === todayKey(), count: countOn(state.days, key), settings: state.settings },
     {
       onTap,
-      onBack() { state.editing = todayKey(); showMonthOf(state.editing); render(); },
+      onBack() { state.fixing = todayKey(); showMonthOf(state.fixing); render(); },
       onOpenSettings() { state.view = "settings"; render(); },
     },
   );
@@ -93,7 +137,7 @@ function rollOver(newToday) {
   const previous = today;
   today = newToday;
   // Follow the new day only if the tracker was on the old today; keep a past day Sophie is fixing.
-  if (state.editing === previous) state.editing = today;
+  if (state.fixing === previous) state.fixing = today;
   if (state.shown.year === Number(previous.slice(0, 4)) && state.shown.month === Number(previous.slice(5, 7)) - 1) {
     showMonthOf(today);
   }
@@ -104,7 +148,7 @@ function tick() {
   const now = new Date();
   if (dateKey(now) !== today) rollOver(dateKey(now));
   const { due, fired } = dueReminders(now, state.settings, countOn(state.days, today), state.fired);
-  for (const { message } of due) showReminder(message);
+  for (const { id, message } of due) showReminder(message, `${id}-${today}`);
   if (JSON.stringify(fired) !== JSON.stringify(state.fired)) {
     state.fired = fired;
     persist();
