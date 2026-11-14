@@ -3,7 +3,7 @@
 // installs under the new name, takes over on the next load, and activate
 // deletes the old cache. The Google Fonts are cross-origin and not cached; the
 // page falls back to system fonts offline.
-const CACHE = "refill-v1";
+const CACHE = "refill-v2";
 
 // Every file the page loads. tests/smoke/install.test.js checks that each
 // src/**/*.js module is listed, so a new module cannot be forgotten.
@@ -29,7 +29,7 @@ const PRECACHE = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting()),
+    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE.map((url) => new Request(url, { cache: "reload" })))).then(() => self.skipWaiting()),
   );
 });
 
@@ -45,5 +45,14 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }).then((hit) => hit ?? fetch(event.request)),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) =>
+      windows.length > 0 ? windows[0].focus() : self.clients.openWindow("./"),
+    ),
   );
 });

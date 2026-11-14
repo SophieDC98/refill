@@ -88,3 +88,9 @@ test("works offline once the service worker has taken over", async () => {
   assert.deepEqual(errors, []);
   await context.close();
 });
+
+test("the precache bypasses the HTTP cache and the cache name was bumped past v1", async () => {
+  const sw = await readFile(join(root, "sw.js"), "utf8");
+  assert.match(sw, /new Request\(url, \{ cache: "reload" \}\)/);
+  assert.doesNotMatch(sw, /CACHE = "refill-v1"/);
+});
