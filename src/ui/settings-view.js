@@ -8,13 +8,15 @@ const reminder = (id, title, sub, { on }) =>
   `<input type="time" id="${id}Time" aria-label="${title} time">` +
   `<label class="switch"><input type="checkbox" id="${id}On"${on ? " checked" : ""} aria-label="${title} on or off"><span></span></label></div>`;
 
+const NOTIF_TEXT = {
+  on: "Notifications are on.",
+  off: "Notifications are off.",
+  blocked: "Notifications are blocked by Windows or your company. refill can't remind you.",
+  unsupported: "This browser can't show notifications.",
+};
+
 export function renderSettings(root, settings, notifState, { onChange, onDone, onEnableNotifications }) {
   const { morning, lunch, afternoon } = settings.parts;
-  const notif =
-    notifState === "off"
-      ? `<div class="rem"><span class="note">Notifications are off.</span><button type="button" class="primary" id="enableNotifications">Turn on</button></div>`
-      : "";
-
   root.innerHTML =
     `<div class="head"><h2>Settings</h2><button type="button" class="iconbtn" id="done">Done</button></div>` +
     `<div class="settings">` +
@@ -29,7 +31,7 @@ export function renderSettings(root, settings, notifState, { onChange, onDone, o
     `<fieldset><legend>Reminders · Mon–Fri</legend>` +
     reminder("morningCheck", "Morning check", "Only when you're behind on the morning", settings.morningCheck) +
     reminder("dayTotal", "Day total", "How many of your goal you drank", settings.dayTotal) +
-    notif +
+    `<div id="notif"></div>` +
     `</fieldset></div>`;
 
   // Fields are updated in place after a change (not rebuilt), so keyboard focus stays put.
@@ -65,6 +67,19 @@ export function renderSettings(root, settings, notifState, { onChange, onDone, o
   }
 
   root.querySelector("#done").onclick = onDone;
-  const enable = root.querySelector("#enableNotifications");
-  if (enable) enable.onclick = onEnableNotifications;
+
+  // The notifications row is updated in place, like the fields above.
+  const showNotif = (state) => {
+    const text = NOTIF_TEXT[state] ?? NOTIF_TEXT.unsupported;
+    const button = state === "off" ? `<button type="button" class="primary" id="enableNotifications">Turn on</button>` : "";
+    root.querySelector("#notif").innerHTML = `<div class="rem"><span class="note">${text}</span>${button}</div>`;
+    const enable = root.querySelector("#enableNotifications");
+    if (enable) {
+      enable.onclick = async () => {
+        showNotif(await onEnableNotifications());
+        (root.querySelector("#enableNotifications") ?? root.querySelector("#done")).focus();
+      };
+    }
+  };
+  showNotif(notifState);
 }

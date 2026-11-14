@@ -22,6 +22,12 @@ Your data stays in the browser's localStorage.
   removes bottles in the afternoon), the bottle size, and the morning check and
   day total reminders (on or off, and the time). Lowering the goal never
   removes bottles you already logged.
+- Reminders, Monday to Friday: the morning check (only when you are behind on
+  the morning) and the day total show as notifications at their times, once a
+  day, and up to an hour late if the app was closed then. Open the app and turn
+  notifications on in Settings ("Turn on"); if Windows or your company blocks
+  them, Settings says so. After midnight the app moves on to the new day by
+  itself.
 
 ## Run it locally
 

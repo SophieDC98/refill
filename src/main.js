@@ -1,4 +1,6 @@
 import { load, save } from "./core/storage.js";
+import { dueReminders } from "./core/reminders.js";
+import { notificationState, askPermission, showReminder } from "./notify.js";
 import { dateKey, countOn, tapBottle, reachedGoal } from "./core/days.js";
 import { goal } from "./core/settings.js";
 import { renderTracker } from "./ui/tracker.js";
@@ -10,8 +12,9 @@ const windowEl = document.getElementById("window");
 const root = document.getElementById("app");
 
 const state = { ...load(localStorage), view: "today", editing: null };
-const todayKey = () => dateKey(new Date());
-state.editing = todayKey();
+let today = dateKey(new Date());
+const todayKey = () => today;
+state.editing = today;
 const now = new Date();
 state.shown = { year: now.getFullYear(), month: now.getMonth() };
 
@@ -52,10 +55,10 @@ function onChangeSettings(settings) {
 
 function render() {
   if (state.view === "settings") {
-    renderSettings(root, state.settings, "off", {
+    renderSettings(root, state.settings, notificationState(), {
       onChange: onChangeSettings,
       onDone() { state.view = "today"; render(); },
-      onEnableNotifications() {},
+      onEnableNotifications: askPermission,
     });
     return;
   }
@@ -85,3 +88,29 @@ function render() {
 }
 
 render();
+
+function rollOver(newToday) {
+  const previous = today;
+  today = newToday;
+  // Follow the new day only if the tracker was on the old today; keep a past day Sophie is fixing.
+  if (state.editing === previous) state.editing = today;
+  if (state.shown.year === Number(previous.slice(0, 4)) && state.shown.month === Number(previous.slice(5, 7)) - 1) {
+    showMonthOf(today);
+  }
+  if (state.view === "today") render(); // settings are redrawn when Sophie taps Done
+}
+
+function tick() {
+  const now = new Date();
+  if (dateKey(now) !== today) rollOver(dateKey(now));
+  const { due, fired } = dueReminders(now, state.settings, countOn(state.days, today), state.fired);
+  for (const { message } of due) showReminder(message);
+  if (JSON.stringify(fired) !== JSON.stringify(state.fired)) {
+    state.fired = fired;
+    persist();
+  }
+}
+
+setInterval(tick, 30 * 1000);
+document.addEventListener("visibilitychange", tick);
+tick();
