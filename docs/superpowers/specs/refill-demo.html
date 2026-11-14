@@ -1,0 +1,500 @@
+<title>refill demo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one small app window (as it would sit in a screen corner), with a demo panel beside it to fire the reminders. */
+:root {
+  --bg: #eef3f8;
+  --surface: #ffffff;
+  --fg: #16253a;
+  --muted: #5b6b80;
+  --line: #d5dee9;
+  --accent: #2f6fb8;
+  --accent-ink: #ffffff;
+  --chrome: #e3eaf2;
+
+  /* pixel bottle */
+  --px-out: #7a90ab;
+  --px-cap: #1d2a5c;
+  --px-capd: #34488f;
+  --px-glass: #f1f6fb;
+  --px-glasshi: #ffffff;
+  --px-water: #a9d4f5;
+  --px-watertop: #d2eafb;
+  --px-waterhi: #e3f2fd;
+  --px-lab: #ffffff;
+  --px-labd: #283c86;
+  --star: #ffd23f;
+  --star-d: #f2a900;
+
+  /* history shades: nothing -> a lot */
+  --shade-0: #ffffff;
+  --shade-1: #d6e8f7;
+  --shade-2: #9cc7ec;
+  --shade-3: #4d8fd1;
+  --shade-4: #17407a;
+  --shade-ink-dark: #16253a;
+  --shade-ink-light: #ffffff;
+
+  --font-display: "Pixelify Sans", "Courier New", monospace;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1722; --surface: #172231; --fg: #e4ecf5; --muted: #93a4b8; --line: #2a3a4e;
+    --accent: #5aa2ec; --accent-ink: #0b1420; --chrome: #1d2a3b;
+    --px-out: #9fb6cf; --px-cap: #4a5fae; --px-capd: #6f84cf; --px-glass: #22324a; --px-glasshi: #2e4260;
+    --px-water: #4f9ae6; --px-watertop: #7fb8f0; --px-waterhi: #79b3ee; --px-lab: #dce8f5; --px-labd: #3a52a8;
+    --star: #ffd84d; --star-d: #f2a900;
+    --shade-0: #1e2b3b; --shade-1: #1f3d60; --shade-2: #255a90; --shade-3: #3277c0; --shade-4: #5aa2ec;
+    --shade-ink-dark: #e4ecf5; --shade-ink-light: #0b1420;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1722; --surface: #172231; --fg: #e4ecf5; --muted: #93a4b8; --line: #2a3a4e;
+  --accent: #5aa2ec; --accent-ink: #0b1420; --chrome: #1d2a3b;
+  --px-out: #9fb6cf; --px-cap: #4a5fae; --px-capd: #6f84cf; --px-glass: #22324a; --px-glasshi: #2e4260;
+  --px-water: #4f9ae6; --px-watertop: #7fb8f0; --px-waterhi: #79b3ee; --px-lab: #dce8f5; --px-labd: #3a52a8;
+  --star: #ffd84d; --star-d: #f2a900;
+  --shade-0: #1e2b3b; --shade-1: #1f3d60; --shade-2: #255a90; --shade-3: #3277c0; --shade-4: #5aa2ec;
+  --shade-ink-dark: #e4ecf5; --shade-ink-light: #0b1420;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 14px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.stage { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; align-items: flex-start; max-width: 860px; margin: 0 auto; }
+.intro { max-width: 860px; margin: 0 auto 20px; display: flex; flex-direction: column; gap: 4px; }
+.intro h1 { font-family: var(--font-display); font-weight: 600; font-size: 22px; margin: 0; letter-spacing: .02em; }
+.intro p { margin: 0; color: var(--muted); max-width: 62ch; }
+
+/* app window */
+.window { width: 380px; max-width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 30px rgba(22,37,58,.12); overflow: hidden; }
+.titlebar { display: flex; align-items: center; justify-content: space-between; background: var(--chrome); padding: 6px 4px 6px 12px; font-size: 12px; color: var(--muted); }
+.titlebar .name { display: flex; align-items: center; gap: 8px; }
+.titlebar .ctrls { display: flex; gap: 2px; }
+.titlebar .ctrls span { width: 30px; text-align: center; font-size: 12px; opacity: .7; }
+.app { padding: 16px; display: flex; flex-direction: column; gap: 18px; }
+
+.head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.head h2 { font-family: var(--font-display); font-weight: 600; font-size: 24px; margin: 0; letter-spacing: .03em; }
+.iconbtn { border: 1px solid var(--line); background: transparent; border-radius: 6px; padding: 4px 10px; font-size: 13px; }
+.iconbtn:hover { background: var(--chrome); }
+
+.daybar { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); }
+.daybar.editing { background: var(--chrome); border-radius: 6px; padding: 6px 8px; color: var(--fg); }
+.linkbtn { background: none; border: none; color: var(--accent); padding: 0; font-weight: 600; font-size: 13px; }
+
+.bottles { display: flex; flex-wrap: wrap; gap: 10px 8px; justify-content: center; }
+.group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.group .row { display: flex; gap: 2px; }
+.group .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.bottle { background: none; border: none; padding: 1px; border-radius: 4px; line-height: 0; }
+.bottle svg { width: 28px; height: 64px; display: block; shape-rendering: crispEdges; image-rendering: pixelated; }
+.bottle:hover svg { transform: translateY(-2px); }
+.bottle.pop svg { animation: pop .28s steps(3); }
+.bottle.ghost svg { opacity: .35; }
+@keyframes pop { 50% { transform: translateY(-5px); } }
+@media (prefers-reduced-motion: reduce) { .bottle.pop svg { animation: none; } .bottle:hover svg { transform: none; } }
+
+.total { text-align: center; display: flex; flex-direction: column; gap: 2px; }
+.total .big { font-family: var(--font-display); font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+.total .sub { color: var(--muted); font-size: 13px; }
+
+.p-out{fill:var(--px-out)} .p-cap{fill:var(--px-cap)} .p-capd{fill:var(--px-capd)}
+.p-glass{fill:var(--px-glass)} .p-glasshi{fill:var(--px-glasshi)}
+.p-water{fill:var(--px-water)} .p-watertop{fill:var(--px-watertop)} .p-waterhi{fill:var(--px-waterhi)}
+.p-lab{fill:var(--px-lab)} .p-labd{fill:var(--px-labd)}
+.p-star{fill:var(--star)} .p-stard{fill:var(--star-d)}
+
+/* goal stars */
+.window { position: relative; }
+.burst { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
+.burst span { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; line-height: 0; }
+.burst svg { width: 100%; height: 100%; shape-rendering: crispEdges; }
+
+/* calendar: blocky pixel grid */
+.cal { border-top: 2px dashed var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.calhead { display: flex; align-items: center; justify-content: space-between; }
+.calhead h3 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 17px; }
+.calnav { display: flex; gap: 4px; }
+.calnav button { border: 2px solid var(--line); background: transparent; border-radius: 0; width: 30px; height: 28px; font-family: var(--font-display); box-shadow: 2px 2px 0 var(--line); }
+.calnav button:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: none; }
+.calnav button:disabled { opacity: .35; cursor: default; }
+.grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.dow { font-family: var(--font-display); font-size: 12px; color: var(--muted); text-align: center; }
+.cell { aspect-ratio: 1; max-width: 100%; min-width: 0; border-radius: 0; border: 2px solid var(--line); background: var(--shade-0); display: flex; align-items: flex-start; justify-content: flex-start; padding: 2px 4px; font-family: var(--font-display); font-size: 12px; font-variant-numeric: tabular-nums; color: var(--shade-ink-dark); box-shadow: inset -3px -3px 0 rgba(22,37,58,.06); }
+.cell.s1 { background: var(--shade-1); border-color: var(--shade-1); box-shadow: inset -3px -3px 0 rgba(22,37,58,.1); }
+.cell.s2 { background: var(--shade-2); border-color: var(--shade-2); box-shadow: inset -3px -3px 0 rgba(22,37,58,.12); }
+.cell.s3 { background: var(--shade-3); border-color: var(--shade-3); color: var(--shade-ink-light); box-shadow: inset -3px -3px 0 rgba(0,0,0,.16); }
+.cell.s4 { background: var(--shade-4); border-color: var(--shade-4); color: var(--shade-ink-light); box-shadow: inset -3px -3px 0 rgba(0,0,0,.2); }
+.cell.future { background: transparent; border-style: dashed; color: var(--muted); cursor: default; box-shadow: none; }
+.cell.today { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cell.sel { outline: 2px solid var(--fg); outline-offset: 2px; }
+.cell.blank { visibility: hidden; }
+.legend { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+.legend .sw { display: flex; gap: 2px; }
+.legend .sw i { width: 12px; height: 12px; border: 2px solid var(--line); box-sizing: border-box; }
+
+/* settings */
+.settings { display: flex; flex-direction: column; gap: 16px; }
+.settings fieldset { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px 12px; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.settings legend { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 0 4px; }
+.fields3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fields2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); min-width: 0; }
+.field input { border: 1px solid var(--line); border-radius: 5px; padding: 5px 7px; background: var(--bg); color: var(--fg); width: 100%; box-sizing: border-box; font-variant-numeric: tabular-nums; }
+.rem { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.rem .what { display: flex; flex-direction: column; min-width: 0; }
+.rem .what span { font-size: 12px; color: var(--muted); }
+.rem input[type=time] { border: 1px solid var(--line); border-radius: 5px; padding: 4px 6px; background: var(--bg); }
+.switch { position: relative; width: 38px; height: 22px; flex: none; }
+.switch input { opacity: 0; width: 100%; height: 100%; margin: 0; position: absolute; cursor: pointer; }
+.switch span { position: absolute; inset: 0; border-radius: 11px; background: var(--line); pointer-events: none; transition: background .15s; }
+.switch span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--surface); transition: transform .15s; }
+.switch input:checked + span { background: var(--accent); }
+.switch input:checked + span::after { transform: translateX(16px); }
+.switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note { font-size: 12px; color: var(--muted); margin: 0; }
+.primary { background: var(--accent); color: var(--accent-ink); border: none; border-radius: 6px; padding: 7px 12px; font-weight: 600; }
+
+/* demo panel */
+.demo { width: 300px; max-width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.demo h3 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 18px; }
+.demo p { margin: 0; color: var(--muted); }
+.demo .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.demo .btns button { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 7px 12px; font-weight: 500; }
+.demo .btns button:hover { border-color: var(--accent); }
+.demo .tag { align-self: flex-start; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; background: var(--chrome); color: var(--muted); border-radius: 4px; padding: 2px 6px; }
+.skipnote { font-size: 13px; background: var(--chrome); border-radius: 6px; padding: 8px 10px; }
+
+/* windows-style notification */
+.toasts { position: fixed; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 8px; z-index: 20; width: 340px; max-width: calc(100vw - 32px); }
+.toast { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 12px 32px rgba(0,0,0,.22); padding: 12px 14px; display: grid; grid-template-columns: 24px 1fr auto; gap: 4px 10px; animation: slide .25s ease-out; }
+.toast .app-n { font-size: 12px; color: var(--muted); grid-column: 2; }
+.toast .x { grid-column: 3; grid-row: 1; background: none; border: none; color: var(--muted); padding: 0 2px; }
+.toast .ico { grid-row: 1 / span 2; line-height: 0; }
+.toast .ico svg { width: 14px; height: 32px; shape-rendering: crispEdges; }
+.toast .msg { grid-column: 2 / span 2; font-weight: 500; }
+@keyframes slide { from { transform: translateY(12px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+</style>
+
+<div class="intro">
+  <h1>refill demo</h1>
+  <p>Tap the bottles, open the settings and fire the reminders. The history is example data and the reminders here are pretend Windows notifications.</p>
+</div>
+
+<div class="stage">
+  <div class="window" aria-label="refill app window">
+    <div class="titlebar">
+      <span class="name"><span id="tbIcon" aria-hidden="true"></span>refill</span>
+      <span class="ctrls" aria-hidden="true"><span>&#8211;</span><span>&#9633;</span><span>&#10005;</span></span>
+    </div>
+    <div class="app" id="app"></div>
+  </div>
+
+  <aside class="demo">
+    <span class="tag">Demo only</span>
+    <h3>Try the reminders</h3>
+    <p>In the real app these pop up on their own at the times in settings, Monday to Friday.</p>
+    <div class="btns">
+      <button type="button" id="fire1">Show the 11:00 one</button>
+      <button type="button" id="fire2">Show the 16:00 one</button>
+    </div>
+    <div class="skipnote" id="skipnote" hidden></div>
+    <p>Tip: fill a few bottles first, then fire them again to see the message change.</p>
+  </aside>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(function () {
+  // ---------- helpers ----------
+  const pad = n => String(n).padStart(2, "0");
+  const keyOf = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  const isWeekday = d => d.getDay() >= 1 && d.getDay() <= 5;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const TODAY = keyOf(today);
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+
+  // ---------- state ----------
+  const defaults = { morning: 3, lunch: 2, afternoon: 3, size: 20,
+    r1: { on: true, time: "11:00" }, r2: { on: true, time: "16:00" } };
+  let settings = Object.assign({}, defaults, store.get("refill-demo-settings") || {});
+  let days = store.get("refill-demo-days");
+  if (!days) {
+    // example history: past weekdays of the last ~3 months, seeded so it looks the same every time
+    days = {};
+    let seed = 7;
+    const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    const d = new Date(today); d.setMonth(d.getMonth() - 3); d.setDate(1);
+    while (d < today) {
+      if (isWeekday(d)) {
+        const r = rnd();
+        days[keyOf(d)] = r < 0.06 ? 0 : r < 0.2 ? 4 + Math.floor(rnd() * 2) : r < 0.85 ? 6 + Math.floor(rnd() * 3) : 9 + Math.floor(rnd() * 2);
+      }
+      d.setDate(d.getDate() + 1);
+    }
+    days[TODAY] = 2;
+  }
+  let view = "today";
+  let editing = TODAY;
+  let cal = { y: today.getFullYear(), m: today.getMonth() };
+  let lastPop = -1;
+
+  const goal = () => settings.morning + settings.lunch + settings.afternoon;
+  const count = k => days[k] || 0;
+  const litres = n => n * settings.size / 100;
+  const fmtL = n => litres(n).toFixed(1).replace(/\.0$/, ".0") + " L";
+  const save = () => { store.set("refill-demo-settings", settings); store.set("refill-demo-days", days); };
+  const shade = n => { const l = litres(n); return l <= 0 ? 0 : l <= 0.6 ? 1 : l <= 1.2 ? 2 : l < 2 ? 3 : 4; };
+
+  // ---------- pixel bottle ----------
+  // 14 x 32 pixel grid of a small glass water bottle: crown cap, lipped neck,
+  // sloping shoulders, a small oval label and a wide navy band. No brand text.
+  const BW = 14, BH = 32, WATER_FROM = 9;
+  // left edge of the glass outline per row (right edge mirrors it)
+  const EDGE = { 3: 4, 4: 4, 5: 5, 6: 5, 7: 5, 8: 4, 9: 4, 10: 4, 11: 3, 12: 3, 13: 3, 14: 3 };
+  const edge = y => EDGE[y] !== undefined ? EDGE[y] : y >= 15 && y <= 30 ? 2 : null;
+  function px(x, y, full) {
+    if (y === 0) return x >= 4 && x <= 9 ? "cap" : null;
+    if (y === 1) return x >= 3 && x <= 10 ? "cap" : null;
+    if (y === 2) return x >= 3 && x <= 10 ? (x % 2 ? "capd" : "cap") : null; // crimped rim
+    if (y === 31) return x >= 3 && x <= 10 ? "out" : null;
+    const L = edge(y); if (L === null) return null;
+    const R = BW - 1 - L;
+    if (x < L || x > R) return null;
+    if (x === L || x === R) return "out";
+    // labels
+    if (y === 12 && x >= 5 && x <= 8) return "labd";
+    if (y === 13 && x >= 4 && x <= 9) return "labd";
+    if (y === 14 && x >= 5 && x <= 8) return "labd";
+    if (y === 21 || y === 28) return "labd";
+    if (y === 22 || y === 27) return "lab";
+    if (y >= 23 && y <= 26) return "labd";
+    // glass and water
+    const wet = full && y >= WATER_FROM;
+    if (x === L + 1 && y >= 4) return wet ? "waterhi" : "glasshi";
+    if (full && y === WATER_FROM) return "watertop";
+    return wet ? "water" : "glass";
+  }
+  function bottleSVG(full) {
+    let rects = "";
+    for (let y = 0; y < BH; y++) {
+      let x = 0;
+      while (x < BW) {
+        const c = px(x, y, full);
+        if (!c) { x++; continue; }
+        let w = 1;
+        while (x + w < BW && px(x + w, y, full) === c) w++;
+        rects += '<rect class="p-' + c + '" x="' + x + '" y="' + y + '" width="' + w + '" height="1"/>';
+        x += w;
+      }
+    }
+    return '<svg viewBox="0 0 ' + BW + " " + BH + '" aria-hidden="true">' + rects + "</svg>";
+  }
+
+  // 7 x 7 pixel star
+  const STAR = ["...s...", "...s...", "sssSsss", ".sSSSs.", "..sss..", ".ss.ss.", "s.....s"];
+  const starSVG = '<svg viewBox="0 0 7 7" aria-hidden="true">' + STAR.map((row, y) =>
+    [...row].map((c, x) => c === "." ? "" : '<rect class="p-' + (c === "S" ? "stard" : "star") + '" x="' + x + '" y="' + y + '" width="1" height="1"/>').join("")).join("") + "</svg>";
+  function burst() {
+    const win = document.querySelector(".window"), row = document.getElementById("bottles");
+    if (!win || !row) return;
+    const w = win.getBoundingClientRect(), r = row.getBoundingClientRect();
+    const cx = r.left - w.left + r.width / 2, cy = r.top - w.top + r.height / 2;
+    const layer = document.createElement("div"); layer.className = "burst"; win.appendChild(layer);
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    for (let i = 0; i < 18; i++) {
+      const s = document.createElement("span"); s.innerHTML = starSVG;
+      const a = (i / 18) * Math.PI * 2 + Math.random() * 0.3, dist = 70 + Math.random() * 90;
+      const dx = Math.cos(a) * dist, dy = Math.sin(a) * dist * 0.8 - 20, size = 0.7 + Math.random() * 0.9;
+      s.style.left = cx + "px"; s.style.top = cy + "px";
+      layer.appendChild(s);
+      const frames = still
+        ? [{ transform: "translate(" + dx + "px," + dy + "px) scale(" + size + ")", opacity: 1 }, { transform: "translate(" + dx + "px," + dy + "px) scale(" + size + ")", opacity: 0 }]
+        : [{ transform: "translate(0,0) scale(.3) rotate(0deg)", opacity: 1 },
+           { transform: "translate(" + dx + "px," + dy + "px) scale(" + size + ") rotate(" + (Math.random() > .5 ? 90 : -90) + "deg)", opacity: 1, offset: 0.65 },
+           { transform: "translate(" + dx + "px," + (dy + 30) + "px) scale(" + size * 0.8 + ") rotate(0deg)", opacity: 0 }];
+      s.animate(frames, { duration: still ? 1200 : 1100 + Math.random() * 500, easing: still ? "linear" : "steps(14)", fill: "forwards" });
+    }
+    setTimeout(() => layer.remove(), 1800);
+  }
+
+  // ---------- rendering ----------
+  const app = document.getElementById("app");
+  document.getElementById("tbIcon").innerHTML = bottleSVG(true).replace("<svg", '<svg style="width:7px;height:16px;display:block;shape-rendering:crispEdges"');
+
+  function render() { view === "today" ? renderToday() : renderSettings(); }
+
+  function renderToday() {
+    const k = editing, n = count(k), g = goal();
+    const d = new Date(k + "T00:00:00");
+    const isToday = k === TODAY;
+    const slots = Math.max(g, n) + (n >= g ? 1 : 0);
+    const groups = [
+      ["morning", 0, settings.morning],
+      ["lunch", settings.morning, settings.morning + settings.lunch],
+      ["afternoon", settings.morning + settings.lunch, g],
+      ["extra", g, slots]
+    ].filter(gr => gr[2] > gr[1]);
+
+    let bottlesHTML = groups.map(([label, a, b]) => {
+      let row = "";
+      for (let i = a; i < b; i++) {
+        const full = i < n, ghost = i >= g && !full;
+        row += '<button type="button" class="bottle' + (ghost ? " ghost" : "") + (i === lastPop ? " pop" : "") +
+          '" data-i="' + i + '" aria-label="Bottle ' + (i + 1) + ", " + (full ? "drunk. Tap to undo" : ghost ? "extra bottle. Tap to add" : "not yet. Tap to log") + '">' +
+          bottleSVG(full) + "</button>";
+      }
+      return '<div class="group"><div class="row">' + row + '</div><span class="lbl">' + label + "</span></div>";
+    }).join("");
+
+    const dayLabel = DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()].slice(0, 3);
+    app.innerHTML =
+      '<div class="head"><h2>refill</h2><button type="button" class="iconbtn" id="openSettings">&#9881; Settings</button></div>' +
+      (isToday
+        ? '<div class="daybar"><span>Today, ' + dayLabel + '</span><span>' + (n >= g ? "Goal reached 🎉" : (g - n) + " to go") + "</span></div>"
+        : '<div class="daybar editing"><span>Fixing <strong>' + dayLabel + '</strong></span><button type="button" class="linkbtn" id="backToday">Back to today</button></div>') +
+      '<div class="bottles" id="bottles">' + bottlesHTML + "</div>" +
+      '<div class="total"><span class="big">' + n + " of " + g + '</span><span class="sub">' + fmtL(n) + " · " + settings.size + "cl bottles</span></div>" +
+      calendarHTML();
+
+    lastPop = -1;
+    document.getElementById("openSettings").onclick = () => { view = "settings"; render(); };
+    const back = document.getElementById("backToday");
+    if (back) back.onclick = () => { editing = TODAY; cal = { y: today.getFullYear(), m: today.getMonth() }; render(); };
+    document.getElementById("bottles").onclick = e => {
+      const b = e.target.closest(".bottle"); if (!b) return;
+      const i = +b.dataset.i, cur = count(editing);
+      if (i < cur) { days[editing] = cur - 1; lastPop = cur - 1; }
+      else { days[editing] = cur + 1; lastPop = cur; }
+      save(); render();
+      if (cur < goal() && days[editing] === goal()) burst();
+      const again = app.querySelector('.bottle[data-i="' + i + '"]') || app.querySelector(".bottle");
+      if (again) again.focus();
+    };
+    app.querySelector(".calnav .prev").onclick = () => { cal.m--; if (cal.m < 0) { cal.m = 11; cal.y--; } render(); };
+    app.querySelector(".calnav .next").onclick = () => { cal.m++; if (cal.m > 11) { cal.m = 0; cal.y++; } render(); };
+    app.querySelector(".grid").onclick = e => {
+      const c = e.target.closest(".cell[data-k]"); if (!c) return;
+      editing = c.dataset.k; render();
+    };
+  }
+
+  function calendarHTML() {
+    const first = new Date(cal.y, cal.m, 1);
+    const last = new Date(cal.y, cal.m + 1, 0);
+    const earliest = Object.keys(days).sort()[0];
+    const canPrev = earliest && keyOf(new Date(cal.y, cal.m, 0)) >= earliest;
+    const canNext = cal.y < today.getFullYear() || (cal.y === today.getFullYear() && cal.m < today.getMonth());
+    let cells = ["Mo","Tu","We","Th","Fr","Sa","Su"].map(x => '<span class="dow">' + x + "</span>").join("");
+    for (let b = 0; b < (first.getDay() + 6) % 7; b++) cells += '<span class="cell blank"></span>';
+    for (let d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
+      const k = keyOf(d), n = count(k), future = k > TODAY;
+      const cls = "cell" + (future ? " future" : " s" + shade(n)) + (k === TODAY ? " today" : "") + (k === editing && k !== TODAY ? " sel" : "");
+      cells += future
+        ? '<span class="' + cls + '">' + d.getDate() + "</span>"
+        : '<button type="button" class="' + cls + '" data-k="' + k + '" aria-label="' + d.getDate() + " " + MONTHS[cal.m] + ": " + n + " bottles, " + fmtL(n) + '">' + d.getDate() + "</button>";
+    }
+    return '<section class="cal" aria-label="History">' +
+      '<div class="calhead"><h3>' + MONTHS[cal.m] + " " + cal.y + '</h3><div class="calnav">' +
+      '<button type="button" class="prev" aria-label="Previous month"' + (canPrev ? "" : " disabled") + '>&#8249;</button>' +
+      '<button type="button" class="next" aria-label="Next month"' + (canNext ? "" : " disabled") + ">&#8250;</button></div></div>" +
+      '<div class="grid">' + cells + "</div>" +
+      '<div class="legend"><span>0 L</span><span class="sw">' + [0,1,2,3,4].map(i => '<i style="background:var(--shade-' + i + ')"></i>').join("") +
+      "</span><span>2 L+</span><span style=\"margin-left:auto\">Tap a day to fix it</span></div></section>";
+  }
+
+  function renderSettings() {
+    const s = settings;
+    app.innerHTML =
+      '<div class="head"><h2>Settings</h2><button type="button" class="iconbtn" id="done">Done</button></div>' +
+      '<div class="settings">' +
+      '<fieldset><legend>Your day</legend><div class="fields3">' +
+        num("morning", "Morning", s.morning) + num("lunch", "Lunch", s.lunch) + num("afternoon", "Afternoon", s.afternoon) +
+      '</div><div class="fields2">' + num("goal", "Daily goal", goal(), 1, 20) + num("size", "Bottle size (cl)", s.size, 5, 150) +
+      '</div><p class="note">The goal is morning + lunch + afternoon. Changing the goal adds or removes bottles in the afternoon.</p></fieldset>' +
+      '<fieldset><legend>Reminders · Mon–Fri</legend>' +
+        rem("r1", "Morning check", "Only when you're behind on the morning", s.r1) +
+        rem("r2", "Afternoon total", "How many of your goal you drank", s.r2) +
+        '<div class="rem"><span class="note" id="notifState">Notifications are not turned on yet.</span><button type="button" class="primary" id="notifBtn">Turn on</button></div>' +
+      "</fieldset></div>";
+
+    document.getElementById("done").onclick = () => { view = "today"; render(); };
+    app.querySelectorAll("input[type=number]").forEach(inp => inp.onchange = () => {
+      const v = Math.max(+inp.min, Math.min(+inp.max, Math.round(+inp.value || 0)));
+      if (inp.id === "goal") {
+        let diff = v - goal();
+        s.afternoon = Math.max(0, s.afternoon + diff);
+        let over = goal() - v; // goal smaller than morning + lunch
+        if (over > 0) { const fromLunch = Math.min(over, s.lunch); s.lunch -= fromLunch; s.morning = Math.max(0, s.morning - (over - fromLunch)); }
+      } else if (inp.id === "size") { s.size = v; }
+      else { s[inp.id] = v; if (goal() < 1) s[inp.id] = 1; }
+      save(); renderSettings();
+    });
+    ["r1", "r2"].forEach(r => {
+      document.getElementById(r + "on").onchange = e => { s[r].on = e.target.checked; save(); };
+      document.getElementById(r + "time").onchange = e => { if (e.target.value) s[r].time = e.target.value; save(); };
+    });
+    document.getElementById("notifBtn").onclick = () => {
+      document.getElementById("notifState").textContent = "In the real app, Windows asks here whether refill may show notifications.";
+    };
+  }
+  function num(id, label, v, min = 0, max = 10) {
+    return '<label class="field" for="' + id + '">' + label + '<input type="number" id="' + id + '" value="' + v + '" min="' + min + '" max="' + max + '"></label>';
+  }
+  function rem(id, title, sub, r) {
+    return '<div class="rem"><div class="what"><strong>' + title + "</strong><span>" + sub + '</span></div>' +
+      '<input type="time" id="' + id + 'time" value="' + r.time + '" aria-label="' + title + ' time">' +
+      '<label class="switch"><input type="checkbox" id="' + id + 'on"' + (r.on ? " checked" : "") + ' aria-label="' + title + ' on or off"><span></span></label></div>';
+  }
+
+  // ---------- reminders (demo) ----------
+  const toasts = document.getElementById("toasts");
+  const skip = document.getElementById("skipnote");
+  function toast(msg) {
+    skip.hidden = true;
+    const t = document.createElement("div");
+    t.className = "toast";
+    t.innerHTML = '<span class="ico">' + bottleSVG(true) + '</span><span class="app-n">refill · now</span><button type="button" class="x" aria-label="Dismiss">&#10005;</button><span class="msg"></span>';
+    t.querySelector(".msg").textContent = msg;
+    t.querySelector(".x").onclick = () => t.remove();
+    toasts.appendChild(t);
+    setTimeout(() => t.remove(), 8000);
+  }
+  function note(msg) { skip.textContent = msg; skip.hidden = false; }
+  document.getElementById("fire1").onclick = () => {
+    if (!settings.r1.on) return note("The morning check is switched off in settings, so nothing would show.");
+    const n = count(TODAY), m = settings.morning;
+    if (n >= m) return note("At " + settings.r1.time + " you're on track (" + n + " of " + m + " this morning), so no notification shows.");
+    const left = m - n;
+    toast(left + " more bottle" + (left === 1 ? "" : "s") + " to stay on track this morning (" + n + " of " + m + ").");
+  };
+  document.getElementById("fire2").onclick = () => {
+    if (!settings.r2.on) return note("The afternoon total is switched off in settings, so nothing would show.");
+    const n = count(TODAY), g = goal();
+    toast(n >= g ? n + " out of " + g + " bottles 🎉 Goal reached!" : "You drank " + n + " out of " + g + " bottles.");
+  };
+
+  render();
+})();
+</script>
