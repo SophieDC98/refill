@@ -44,16 +44,17 @@ test("settings: changing the goal adds bottles to the afternoon", async () => {
 });
 
 test("settings: out-of-range goal is clamped and shown", async () => {
-  const { context, page } = await open();
+  const { context, page, errors } = await open();
   await openSettings(page);
   await page.locator("#goal").fill("99");
   await page.locator("#goal").blur();
   await page.waitForFunction(() => document.querySelector("#goal").value === "20");
+  assert.deepEqual(errors, []);
   await context.close();
 });
 
 test("settings: bottle size changes the litres", async () => {
-  const { context, page } = await open();
+  const { context, page, errors } = await open();
   await page.locator('.bottle[data-i="0"]').click();
   await page.locator('.bottle[data-i="1"]').click();
   await page.getByText("2 of 8").waitFor();
@@ -62,11 +63,12 @@ test("settings: bottle size changes the litres", async () => {
   await page.locator("#bottleCl").blur();
   await done(page);
   await page.getByText("1.0 L").waitFor();
+  assert.deepEqual(errors, []);
   await context.close();
 });
 
 test("settings: lowering the goal keeps the logged bottles", async () => {
-  const { context, page } = await open();
+  const { context, page, errors } = await open();
   for (let i = 0; i < 9; i++) await page.locator(`.bottle[data-i="${i}"]`).click();
   await page.getByText("9 of 8").waitFor();
   await openSettings(page);
@@ -75,6 +77,7 @@ test("settings: lowering the goal keeps the logged bottles", async () => {
   await done(page);
   await page.getByText("9 of 6").waitFor();
   assert.equal(await page.locator(".bottle:not(.ghost)").count(), 9);
+  assert.deepEqual(errors, []);
   await context.close();
 });
 
@@ -87,6 +90,23 @@ test("settings: a reminder switched off stays off after reload", async () => {
   await openSettings(page);
   assert.equal(await page.locator("#dayTotalOn").isChecked(), false);
   assert.equal(await page.locator("#morningCheckOn").isChecked(), true);
+  assert.deepEqual(errors, []);
+  await context.close();
+});
+
+test("settings: keyboard focus follows Tab and stays on a toggled switch", async () => {
+  const { context, page, errors } = await open();
+  await openSettings(page);
+  await page.locator("#morning").focus();
+  await page.keyboard.press("Control+A");
+  await page.keyboard.type("4");
+  await page.keyboard.press("Tab");
+  await page.waitForFunction(() => document.activeElement.id === "lunch");
+  assert.equal(await page.locator("#goal").inputValue(), "9");
+  await page.locator("#dayTotalOn").focus();
+  await page.keyboard.press("Space");
+  assert.equal(await page.locator("#dayTotalOn").isChecked(), false);
+  assert.equal(await page.evaluate(() => document.activeElement.id), "dayTotalOn");
   assert.deepEqual(errors, []);
   await context.close();
 });

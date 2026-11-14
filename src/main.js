@@ -26,9 +26,9 @@ function onTap(index) {
 }
 
 function onChangeSettings(settings) {
+  // The settings view updates its own fields, so it is not redrawn (keeps focus).
   state.settings = settings;
   persist();
-  render();
 }
 
 function render() {
