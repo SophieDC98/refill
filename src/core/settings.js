@@ -28,7 +28,8 @@ export function withGoal(settings, n) {
 }
 
 export function withPart(settings, part, n) {
-  const parts = { ...settings.parts, [part]: clamp(n, 0, 10) };
+  const others = goal(settings) - settings.parts[part];
+  const parts = { ...settings.parts, [part]: clamp(n, 0, Math.max(0, Math.min(10, 20 - others))) };
   const next = { ...settings, parts };
   return goal(next) === 0 ? settings : next;
 }

@@ -20,3 +20,9 @@ test("inputs are not mutated", () => {
   assert.equal(goal(DEFAULT_SETTINGS), 8);
 });
 test("bottle size is clamped", () => assert.equal(withBottleCl(DEFAULT_SETTINGS, 1).bottleCl, 5));
+test("a part change never pushes the goal over 20", () => {
+  const big = { ...DEFAULT_SETTINGS, parts: { morning: 10, lunch: 5, afternoon: 5 } };
+  assert.equal(withPart(big, "lunch", 10).parts.lunch, 5);
+  assert.equal(goal(withPart(big, "afternoon", 10)), 20);
+  assert.equal(withPart(DEFAULT_SETTINGS, "afternoon", 10).parts.afternoon, 10);
+});

@@ -38,13 +38,13 @@ export function renderTracker(root, { key, isToday, count, settings }, { onTap, 
   const label = dayLabel(key);
   const daybar = isToday
     ? `<div class="daybar"><span>Today, ${label}</span><span>${count >= g ? "Goal reached 🎉" : `${g - count} to go`}</span></div>`
-    : `<div class="daybar editing"><span>Fixing <strong>${label}</strong></span><button type="button" class="linkbtn" id="backToday">Back to today</button></div>`;
+    : `<div class="daybar fixing"><span>Fixing <strong>${label}</strong></span><button type="button" class="linkbtn" id="backToday">Back to today</button></div>`;
 
   root.innerHTML =
     `<div class="head"><h2>refill</h2><button type="button" class="iconbtn" id="openSettings">&#9881; Settings</button></div>` +
     daybar +
     `<div class="bottles" id="bottles">${bottles}</div>` +
-    `<div class="total"><span class="big">${count} of ${g}</span><span class="sub">${litres(count, settings.bottleCl).toFixed(1)} L · ${settings.bottleCl}cl bottles</span></div>`;
+    `<div class="total" aria-live="polite"><span class="big">${count} of ${g}</span><span class="sub">${litres(count, settings.bottleCl).toFixed(1)} L · ${settings.bottleCl}cl bottles</span></div>`;
 
   root.querySelector("#openSettings").onclick = onOpenSettings;
   const back = root.querySelector("#backToday");
