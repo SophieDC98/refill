@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { startServer } from "./serve.js";
-import { blockFonts, watchErrors } from "./offline.js";
+import { watchErrors } from "./offline.js";
 
 const { chromium } = createRequire(import.meta.url)("playwright");
 const root = fileURLToPath(new URL("../..", import.meta.url));
@@ -32,7 +32,6 @@ async function jsFiles(dir) {
 
 test("manifest links, parses, and its icons load", async () => {
   const context = await browser.newContext();
-  await blockFonts(context);
   const page = await context.newPage();
   const errors = watchErrors(page);
   await page.goto(server.url + "/index.html");
@@ -58,9 +57,9 @@ test("manifest links, parses, and its icons load", async () => {
 
 test("the precache list names every module and the manifest and icons", async () => {
   const sw = await readFile(join(root, "sw.js"), "utf8");
-  const listed = new Set([...sw.matchAll(/"(\.\/[^"]*|[^"]+\.[a-z]+)"/g)].map((m) => m[1].replace(/^\.\//, "")));
+  const listed = new Set([...sw.matchAll(/"(\.\/[^"]*|[^"]+\.[a-z0-9]+)"/g)].map((m) => m[1].replace(/^\.\//, "")));
   for (const file of await jsFiles("src")) assert.ok(listed.has(file), `${file} missing from precache`);
-  for (const file of ["index.html", "styles.css", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"]) {
+  for (const file of ["index.html", "styles.css", "manifest.webmanifest", "fonts/inter-latin.woff2", "fonts/pixelify-sans-latin.woff2", "icons/icon-192.png", "icons/icon-512.png"]) {
     assert.ok(listed.has(file), `${file} missing from precache`);
   }
 });
@@ -68,7 +67,6 @@ test("the precache list names every module and the manifest and icons", async ()
 test("works offline once the service worker has taken over", async () => {
   const own = await startServer(root); // its own server, so it can be stopped
   const context = await browser.newContext();
-  await blockFonts(context);
   const page = await context.newPage();
   const errors = watchErrors(page);
   await page.goto(own.url + "/index.html");
@@ -93,4 +91,23 @@ test("the precache bypasses the HTTP cache and the cache name was bumped past v1
   const sw = await readFile(join(root, "sw.js"), "utf8");
   assert.match(sw, /new Request\(url, \{ cache: "reload" \}\)/);
   assert.doesNotMatch(sw, /CACHE = "refill-v1"/);
+});
+
+test("the page and its fonts come from its own origin only", async () => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const errors = watchErrors(page);
+  const foreign = [];
+  page.on("request", (r) => {
+    if (!r.url().startsWith("data:") && new URL(r.url()).origin !== server.url) foreign.push(r.url());
+  });
+  const fonts = [];
+  page.on("response", (r) => { if (r.url().endsWith(".woff2")) fonts.push(r.status()); });
+  await page.goto(server.url + "/index.html");
+  await page.getByText("0 of 8").waitFor();
+  await page.evaluate(() => document.fonts.ready);
+  assert.deepEqual(foreign, []);
+  assert.deepEqual(fonts, [200, 200]);
+  assert.deepEqual(errors, []);
+  await context.close();
 });

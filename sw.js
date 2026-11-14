@@ -1,8 +1,7 @@
 // Offline support: every app file is cached on install and served cache-first.
 // When any cached file changes, bump CACHE (refill-v2, ...): the new worker
 // installs under the new name, takes over on the next load, and activate
-// deletes the old cache. The Google Fonts are cross-origin and not cached; the
-// page falls back to system fonts offline.
+// deletes the old cache.
 const CACHE = "refill-v2";
 
 // Every file the page loads. tests/smoke/install.test.js checks that each
@@ -12,6 +11,8 @@ const PRECACHE = [
   "index.html",
   "styles.css",
   "manifest.webmanifest",
+  "fonts/inter-latin.woff2",
+  "fonts/pixelify-sans-latin.woff2",
   "icons/icon-192.png",
   "icons/icon-512.png",
   "src/main.js",

@@ -14,8 +14,9 @@ https://sophiedc98.github.io/refill/. It lives under `/refill/`, so every path
 in the page, the manifest and the service worker is relative.
 
 `sw.js` precaches the app files under a versioned cache name and serves them
-cache-first, so the installed app opens offline. The Google Fonts are not
-cached; offline the page uses system fonts. A new worker takes over on the next
+cache-first, so the installed app opens offline. The fonts (Pixelify Sans and Inter, latin, variable, under the OFL; licences in
+`fonts/`) are bundled and precached, so nothing is fetched from other sites and
+they work offline. A new worker takes over on the next
 load (`skipWaiting` on install, `clients.claim` on activate) and deletes older
 caches. Every precache request bypasses the HTTP cache (`cache: "reload"`), so a
 new worker never stores stale files. The cache name must be bumped (`refill-v2`, `refill-v3`, ...) whenever

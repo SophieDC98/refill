@@ -3,7 +3,8 @@
 Refill helps me hydrate by tracking the water bottles I drink daily.
 
 It is a small static web app: no build, no framework, no runtime dependencies.
-Your data stays in the browser's localStorage.
+Your data stays in the browser's localStorage. The fonts are bundled, so
+nothing is fetched from other sites.
 
 ## What it does so far
 

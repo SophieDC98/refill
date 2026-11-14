@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { startServer } from "./serve.js";
-import { blockFonts, watchErrors } from "./offline.js";
+import { watchErrors } from "./offline.js";
 
 const { chromium } = createRequire(import.meta.url)("playwright");
 
@@ -19,7 +19,6 @@ after(async () => {
 
 test("tracker: log, undo, reach the goal, keep it after reload", async () => {
   const context = await browser.newContext();
-  await blockFonts(context);
   const page = await context.newPage();
   const errors = watchErrors(page);
 

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { startServer } from "./serve.js";
-import { blockFonts, watchErrors } from "./offline.js";
+import { watchErrors } from "./offline.js";
 
 const { chromium } = createRequire(import.meta.url)("playwright");
 
@@ -20,13 +20,14 @@ after(async () => {
 // Monday 16 Nov 2026. `permission` null removes Notification altogether.
 async function open({ at, days = {}, permission = "granted" }) {
   const context = await browser.newContext();
-  await blockFonts(context);
   const page = await context.newPage();
   const errors = watchErrors(page);
   await page.clock.install({ time: at });
   await page.addInitScript(
     ([perm, d]) => {
       window.__shown = [];
+      // Without a service worker the app shows notifications through the Notification mock below.
+      delete Navigator.prototype.serviceWorker;
       if (perm === null) {
         delete window.Notification;
       } else {
