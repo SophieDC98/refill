@@ -2,6 +2,7 @@ import { load, save } from "./core/storage.js";
 import { dateKey, countOn, tapBottle, reachedGoal } from "./core/days.js";
 import { goal } from "./core/settings.js";
 import { renderTracker } from "./ui/tracker.js";
+import { renderSettings } from "./ui/settings-view.js";
 import { burst } from "./ui/stars.js";
 
 const windowEl = document.getElementById("window");
@@ -24,7 +25,21 @@ function onTap(index) {
   if (reachedGoal(before, after, goal(state.settings))) burst(windowEl, root.querySelector("#bottles"));
 }
 
+function onChangeSettings(settings) {
+  state.settings = settings;
+  persist();
+  render();
+}
+
 function render() {
+  if (state.view === "settings") {
+    renderSettings(root, state.settings, "off", {
+      onChange: onChangeSettings,
+      onDone() { state.view = "today"; render(); },
+      onEnableNotifications() {},
+    });
+    return;
+  }
   const key = state.editing;
   renderTracker(
     root,
@@ -32,7 +47,7 @@ function render() {
     {
       onTap,
       onBack() { state.editing = todayKey(); render(); },
-      onOpenSettings() {},
+      onOpenSettings() { state.view = "settings"; render(); },
     },
   );
 }

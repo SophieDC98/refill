@@ -12,6 +12,10 @@ Your data stays in the browser's localStorage.
 - Shows "N of G" and the litres, and how many are left to go.
 - Past the daily goal it adds an extra bottle, and a burst of stars marks
   reaching the goal.
+- Settings: the bottles in each part, the daily goal (changing it adds or
+  removes bottles in the afternoon), the bottle size, and the morning check and
+  day total reminders (on or off, and the time). Lowering the goal never
+  removes bottles you already logged.
 
 ## Run it locally
 
