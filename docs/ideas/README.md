@@ -9,3 +9,6 @@ to its roadmap entry, and once built it reads `built`, with a link to the
 decision that settled it. The file stays either way.
 
 Each idea gets one line below, a link and a few words.
+
+- [Backup](backup.md) keep the history safe when browser data is cleared.
+- [Goal stars](goal-stars.md) a small yellow star on calendar days that reached the goal.
