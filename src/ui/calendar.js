@@ -8,8 +8,10 @@ const keyOf = (y, m, d) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).p
 
 function earliestMonth(days, todayKey) {
   const logged = Object.keys(days).filter((k) => days[k] > 0).sort();
-  const key = logged[0] ?? todayKey;
-  return monthIndex(Number(key.slice(0, 4)), Number(key.slice(5, 7)) - 1);
+  const monthOf = (key) => monthIndex(Number(key.slice(0, 4)), Number(key.slice(5, 7)) - 1);
+  // Always one month back, so an empty history can still be looked at and a forgotten day fixed.
+  const previous = monthOf(todayKey) - 1;
+  return logged[0] ? Math.min(monthOf(logged[0]), previous) : previous;
 }
 
 export function renderCalendar(root, { year, month, days, todayKey, selectedKey, bottleCl }, { onPick, onMonth }) {

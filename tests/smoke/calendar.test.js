@@ -67,10 +67,13 @@ test("calendar: shades, weekends, future days, month navigation", async () => {
   await context.close();
 });
 
-test("calendar: previous month is disabled on the current month when nothing is logged", async () => {
+test("calendar: with nothing logged, one month back is allowed and no further", async () => {
   const { context, page, errors } = await open({});
-  assert.equal(await page.locator(".calnav .prev").isDisabled(), true);
+  assert.equal(await page.locator(".calnav .prev").isDisabled(), false);
   assert.equal(await page.locator(".calnav .next").isDisabled(), true);
+  await page.locator(".calnav .prev").click();
+  await page.getByText("October 2026").waitFor();
+  assert.equal(await page.locator(".calnav .prev").isDisabled(), true);
   assert.deepEqual(errors, []);
   await context.close();
 });
