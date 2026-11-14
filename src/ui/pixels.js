@@ -29,6 +29,16 @@ function px(x, y, full) {
   return wet ? "water" : "glass";
 }
 
+// The bottle as a list of [x, y, colour] cells, for drawing it somewhere other than SVG (the app icons).
+export function bottlePixels(full) {
+  const cells = [];
+  for (let y = 0; y < BH; y++) for (let x = 0; x < BW; x++) {
+    const c = px(x, y, full);
+    if (c) cells.push([x, y, c]);
+  }
+  return { width: BW, height: BH, cells };
+}
+
 export function bottleSVG(full) {
   let rects = "";
   for (let y = 0; y < BH; y++) {
