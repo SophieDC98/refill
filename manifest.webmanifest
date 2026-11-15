@@ -1,6 +1,6 @@
 {
-  "name": "refill",
-  "short_name": "refill",
+  "name": "Refill",
+  "short_name": "Refill",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

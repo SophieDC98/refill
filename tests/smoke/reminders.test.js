@@ -101,7 +101,7 @@ test("notifications: settings text follows the permission", async () => {
   for (const [permission, text] of [
     ["granted", "Notifications are on."],
     ["default", "Notifications are off."],
-    ["denied", "Notifications are blocked by Windows or your company. refill can't remind you."],
+    ["denied", "Notifications are blocked by Windows or your company. Refill can't remind you."],
     [null, "This browser can't show notifications."],
   ]) {
     const { context, page, errors } = await open({ at: new Date(2026, 10, 16, 10, 0), permission });

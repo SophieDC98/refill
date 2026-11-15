@@ -11,7 +11,7 @@ const reminder = (id, title, sub, { on }) =>
 const NOTIF_TEXT = {
   on: "Notifications are on.",
   off: "Notifications are off.",
-  blocked: "Notifications are blocked by Windows or your company. refill can't remind you.",
+  blocked: "Notifications are blocked by Windows or your company. Refill can't remind you.",
   unsupported: "This browser can't show notifications.",
 };
 

@@ -23,8 +23,8 @@ export async function showReminder(message, tag) {
     const options = { body: message, tag, icon: "icons/icon-192.png" };
     const worker = navigator.serviceWorker;
     const registration = worker?.controller ? await worker.ready : null;
-    if (registration) await registration.showNotification("refill", options);
-    else new Notification("refill", options);
+    if (registration) await registration.showNotification("Refill", options);
+    else new Notification("Refill", options);
   } catch {
     // A reminder that cannot be shown is not worth breaking the app.
   }

@@ -31,7 +31,7 @@ const { storage, usable } = openStorage();
 const notice = document.createElement("p");
 notice.className = "storage-notice";
 notice.setAttribute("role", "status");
-notice.textContent = "Can't save on this browser \u2014 counts will be lost when refill closes.";
+notice.textContent = "Can't save on this browser \u2014 counts will be lost when Refill closes.";
 notice.hidden = usable;
 windowEl.append(notice);
 

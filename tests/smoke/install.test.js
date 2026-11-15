@@ -43,7 +43,7 @@ test("manifest links, parses, and its icons load", async () => {
   assert.equal(response.status(), 200);
   const manifest = await response.json();
   assert.equal(manifest.display, "standalone");
-  assert.equal(manifest.name, "refill");
+  assert.equal(manifest.name, "Refill");
   assert.equal(manifest.start_url, "./");
   assert.deepEqual(manifest.icons.map((i) => i.sizes).sort(), ["192x192", "512x512"]);
   for (const icon of manifest.icons) {
