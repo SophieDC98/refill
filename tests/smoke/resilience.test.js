@@ -95,3 +95,36 @@ test("a stable live region announces the total", async () => {
   assert.deepEqual(errors, []);
   await context.close();
 });
+
+test("asks the browser to keep its data permanently", async () => {
+  const context = await browser.newContext();
+  await context.addInitScript(() => {
+    window.__persistCalls = 0;
+    Object.defineProperty(navigator.storage, "persist", { value: () => { window.__persistCalls++; return Promise.resolve(true); } });
+  });
+  const page = await context.newPage();
+  const errors = watchErrors(page);
+  await page.goto(server.url + "/index.html");
+  await page.getByText("0 of 8").waitFor();
+  await page.waitForFunction(() => window.__persistCalls === 1);
+  assert.deepEqual(errors, []);
+  await context.close();
+});
+
+test("a refused or missing permanent-storage request does not break the app", async () => {
+  for (const setup of [
+    () => Object.defineProperty(navigator.storage, "persist", { value: () => Promise.reject(new Error("refused")) }),
+    () => Object.defineProperty(navigator, "storage", { value: undefined }),
+  ]) {
+    const context = await browser.newContext();
+    await context.addInitScript(setup);
+    const page = await context.newPage();
+    const errors = watchErrors(page);
+    await page.goto(server.url + "/index.html");
+    await page.getByText("0 of 8").waitFor();
+    await page.locator('.bottle[data-i="0"]').click();
+    await page.getByText("1 of 8").waitFor();
+    assert.deepEqual(errors, []);
+    await context.close();
+  }
+});

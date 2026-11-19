@@ -2,7 +2,7 @@
 // When any cached file changes, bump CACHE (refill-v2, ...): the new worker
 // installs under the new name, takes over on the next load, and activate
 // deletes the old cache.
-const CACHE = "refill-v5";
+const CACHE = "refill-v6";
 
 // Every file the page loads. tests/smoke/install.test.js checks that each
 // src/**/*.js module is listed, so a new module cannot be forgotten.

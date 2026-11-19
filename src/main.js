@@ -28,6 +28,16 @@ function openStorage() {
 }
 const { storage, usable } = openStorage();
 
+// Ask the browser to keep Refill's data permanently, so it is not deleted when the
+// disk runs low. A company setting that clears site data on close still wins.
+if (usable) {
+  try {
+    navigator.storage?.persist?.()?.catch?.(() => {});
+  } catch {
+    // Not supported: nothing else to do.
+  }
+}
+
 const notice = document.createElement("p");
 notice.className = "storage-notice";
 notice.setAttribute("role", "status");
