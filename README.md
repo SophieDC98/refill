@@ -36,7 +36,8 @@ nothing is fetched from other sites.
 - Settings: the bottles in each part, the daily goal (changing it adds or
   removes bottles in the afternoon), the bottle size, and the morning check and
   day total reminders (on or off, and the time). Lowering the goal never
-  removes bottles you already logged.
+  removes bottles you already logged. The bottom of Settings shows which
+  version of Refill is running.
 
   <img src="docs/images/settings.png" width="330" alt="Settings: bottles per part, daily goal, bottle size, and the two reminders with their times and switches">
 - Reminders, Monday to Friday: the morning check (only when you are behind on

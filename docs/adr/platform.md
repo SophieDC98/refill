@@ -19,5 +19,7 @@ cache-first, so the installed app opens offline. The fonts (Pixelify Sans and In
 they work offline. A new worker takes over on the next
 load (`skipWaiting` on install, `clients.claim` on activate) and deletes older
 caches. Every precache request bypasses the HTTP cache (`cache: "reload"`), so a
-new worker never stores stale files. The cache name must be bumped (`refill-v2`, `refill-v3`, ...) whenever
-a cached file changes, or installed copies keep the old files.
+new worker never stores stale files. Every release raises `VERSION` in `src/version.js` by one, and the cache name
+follows it (`refill-v7`, `refill-v8`, ...); a unit test fails if they differ.
+Without a new cache name, installed copies keep the old files. Settings shows
+the version, so Sophie can check which release she is running.

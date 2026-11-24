@@ -1,8 +1,8 @@
 // Offline support: every app file is cached on install and served cache-first.
-// When any cached file changes, bump CACHE (refill-v2, ...): the new worker
+// When any cached file changes, raise VERSION in src/version.js and CACHE here to match (refill-v7, ...): the new worker
 // installs under the new name, takes over on the next load, and activate
 // deletes the old cache.
-const CACHE = "refill-v6";
+const CACHE = "refill-v7";
 
 // Every file the page loads. tests/smoke/install.test.js checks that each
 // src/**/*.js module is listed, so a new module cannot be forgotten.
@@ -26,6 +26,7 @@ const PRECACHE = [
   "src/ui/settings-view.js",
   "src/ui/stars.js",
   "src/ui/tracker.js",
+  "src/version.js",
 ];
 
 self.addEventListener("install", (event) => {
