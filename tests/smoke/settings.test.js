@@ -110,11 +110,10 @@ test("settings: keyboard focus follows Tab and stays on a toggled switch", async
   await context.close();
 });
 
-test("settings show the app's version", async () => {
-  const { VERSION } = await import("../../src/version.js");
+test("settings show which version is running ('development' when run locally)", async () => {
   const { context, page, errors } = await open();
   await page.locator("#openSettings").click();
-  await page.getByText(`Refill version ${VERSION}`).waitFor();
+  await page.getByText("Refill development").waitFor();
   assert.deepEqual(errors, []);
   await context.close();
 });

@@ -1,8 +1,8 @@
 // Offline support: every app file is cached on install and served cache-first.
-// When any cached file changes, raise VERSION in src/version.js and CACHE here to match (refill-v7, ...): the new worker
+// Publishing names CACHE after the commit (scripts/stamp-version.mjs), so every release gets a new cache: the new worker
 // installs under the new name, takes over on the next load, and activate
 // deletes the old cache.
-const CACHE = "refill-v7";
+const CACHE = "refill-development";
 
 // Every file the page loads. tests/smoke/install.test.js checks that each
 // src/**/*.js module is listed, so a new module cannot be forgotten.

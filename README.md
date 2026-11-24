@@ -37,7 +37,8 @@ nothing is fetched from other sites.
   removes bottles in the afternoon), the bottle size, and the morning check and
   day total reminders (on or off, and the time). Lowering the goal never
   removes bottles you already logged. The bottom of Settings shows which
-  version of Refill is running.
+  version is running: the commit and its date, or "development" when run
+  locally.
 
   <img src="docs/images/settings.png" width="330" alt="Settings: bottles per part, daily goal, bottle size, and the two reminders with their times and switches">
 - Reminders, Monday to Friday: the morning check (only when you are behind on
@@ -81,6 +82,9 @@ counts and settings stay, as long as you leave "clear data" unticked.
 
 - `node scripts/readme-shots.mjs` retakes the screenshots in this README, with
   made-up example history.
+- Every push to `main` publishes the site through GitHub Actions
+  (`.github/workflows/pages.yml`), which stamps the commit into the app. In the
+  repository's Settings → Pages, the source must be "GitHub Actions".
 
 - `npm run serve` serves the app; open http://localhost:8000.
 - `npm test` runs the unit tests.

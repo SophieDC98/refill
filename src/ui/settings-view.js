@@ -1,5 +1,5 @@
 import { goal, withGoal, withPart, withBottleCl } from "../core/settings.js";
-import { VERSION } from "../version.js";
+import { versionLabel } from "../version.js";
 
 const field = (id, label, value, min, max) =>
   `<label class="field" for="${id}">${label}<input type="number" id="${id}" value="${value}" min="${min}" max="${max}"></label>`;
@@ -34,7 +34,7 @@ export function renderSettings(root, settings, notifState, { onChange, onDone, o
     reminder("dayTotal", "Day total", "How many of your goal you drank", settings.dayTotal) +
     `<div id="notif"></div>` +
     `</fieldset>` +
-    `<p class="note version">Refill version ${VERSION}</p></div>`;
+    `<p class="note version">${versionLabel()}</p></div>`;
 
   // Fields are updated in place after a change (not rebuilt), so keyboard focus stays put.
   let current = settings;

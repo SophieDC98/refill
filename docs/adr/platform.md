@@ -19,7 +19,11 @@ cache-first, so the installed app opens offline. The fonts (Pixelify Sans and In
 they work offline. A new worker takes over on the next
 load (`skipWaiting` on install, `clients.claim` on activate) and deletes older
 caches. Every precache request bypasses the HTTP cache (`cache: "reload"`), so a
-new worker never stores stale files. Every release raises `VERSION` in `src/version.js` by one, and the cache name
-follows it (`refill-v7`, `refill-v8`, ...); a unit test fails if they differ.
-Without a new cache name, installed copies keep the old files. Settings shows
-the version, so Sophie can check which release she is running.
+new worker never stores stale files. Publishing goes through GitHub Actions (`.github/workflows/pages.yml`, with
+Pages' source set to "GitHub Actions"), not straight from the branch, because
+the app has no build step and cannot know its own commit. Before publishing,
+`scripts/stamp-version.mjs` writes the commit's short hash and date into
+`src/version.js`, which Settings shows ("Refill a7e262d · 24 Nov 2026"), and names
+the offline cache after the commit (`refill-a7e262d`). So every push updates
+installed copies with no manual cache bump. Run locally, the app says
+"development".
