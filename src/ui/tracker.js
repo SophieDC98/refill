@@ -1,6 +1,6 @@
 import { goal } from "../core/settings.js";
-import { slots, litres } from "../core/days.js";
-import { bottleSVG } from "./pixels.js";
+import { slots, litres, daysAtGoalText } from "../core/days.js";
+import { bottleSVG, starSVG } from "./pixels.js";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -17,7 +17,7 @@ function bottleHTML(i, full, goalCount) {
   return `<button type="button" class="bottle${ghost ? " ghost" : ""}" data-i="${i}" aria-label="Bottle ${i + 1}, ${action}">${bottleSVG(full)}</button>`;
 }
 
-export function renderTracker(root, { key, isToday, count, settings }, { onTap, onBack, onOpenSettings }) {
+export function renderTracker(root, { key, isToday, count, settings, daysAtGoal }, { onTap, onBack, onOpenSettings }) {
   const g = goal(settings);
   const { morning, lunch, afternoon } = settings.parts;
   const groups = [
@@ -44,7 +44,8 @@ export function renderTracker(root, { key, isToday, count, settings }, { onTap, 
     `<div class="head"><h2>Refill</h2><button type="button" class="iconbtn" id="openSettings">&#9881; Settings</button></div>` +
     daybar +
     `<div class="bottles" id="bottles">${bottles}</div>` +
-    `<div class="total"><span class="big">${count} of ${g}</span><span class="sub">${litres(count, settings.bottleCl).toFixed(1)} L · ${settings.bottleCl}cl bottles</span></div>`;
+    `<div class="total"><span class="big">${count} of ${g}</span><span class="sub">${litres(count, settings.bottleCl).toFixed(1)} L · ${settings.bottleCl}cl bottles</span>` +
+    `<span class="at-goal">${starSVG()}${daysAtGoalText(daysAtGoal)}</span></div>`;
 
   root.querySelector("#openSettings").onclick = onOpenSettings;
   const back = root.querySelector("#backToday");

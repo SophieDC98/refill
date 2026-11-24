@@ -43,3 +43,33 @@ test("tracker: log, undo, reach the goal, keep it after reload", async () => {
   assert.deepEqual(errors, []);
   await context.close();
 });
+
+test("tracker: counts the days at goal, and today joins when the goal is reached", async () => {
+  const context = await browser.newContext();
+  await context.addInitScript(() => {
+    if (sessionStorage.getItem("seeded")) return;
+    sessionStorage.setItem("seeded", "1");
+    const days = { "2026-01-05": 8, "2026-01-06": 3, "2026-01-10": 9 };
+    localStorage.setItem("refill", JSON.stringify({ version: 1, days }));
+  });
+  const page = await context.newPage();
+  const errors = watchErrors(page);
+  await page.goto(server.url + "/index.html");
+  await page.getByText("2 days fully refilled").waitFor();
+  for (let i = 0; i < 8; i++) await page.locator('.bottle[data-i="7"]').click();
+  await page.getByText("3 days fully refilled").waitFor();
+  await page.locator('.bottle[data-i="0"]').click();
+  await page.getByText("2 days fully refilled").waitFor();
+  assert.deepEqual(errors, []);
+  await context.close();
+});
+
+test("tracker: with no days at goal yet, it says so (Not fully refilled yet)", async () => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const errors = watchErrors(page);
+  await page.goto(server.url + "/index.html");
+  await page.getByText("Not fully refilled yet").waitFor();
+  assert.deepEqual(errors, []);
+  await context.close();
+});

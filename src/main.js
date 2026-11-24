@@ -1,7 +1,7 @@
 import { load, save, STORAGE_KEY } from "./core/storage.js";
 import { dueReminders } from "./core/reminders.js";
 import { notificationState, askPermission, showReminder } from "./notify.js";
-import { dateKey, countOn, tapBottle, reachedGoal } from "./core/days.js";
+import { dateKey, countOn, tapBottle, reachedGoal, daysAtGoal } from "./core/days.js";
 import { goal } from "./core/settings.js";
 import { renderTracker } from "./ui/tracker.js";
 import { renderCalendar } from "./ui/calendar.js";
@@ -138,7 +138,7 @@ function render() {
   }
   renderTracker(
     trackerRoot,
-    { key, isToday: key === todayKey(), count: countOn(state.days, key), settings: state.settings },
+    { key, isToday: key === todayKey(), count: countOn(state.days, key), settings: state.settings, daysAtGoal: daysAtGoal(state.days, goal(state.settings)) },
     {
       onTap,
       onBack() { state.fixing = todayKey(); showMonthOf(state.fixing); render(); },

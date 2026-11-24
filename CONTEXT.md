@@ -45,3 +45,9 @@ The reminder with the day's count of logged bottles against the daily goal.
 **Fixing a day**:
 Changing the count of a past day.
 _Avoid_: editing, backfilling
+
+**Fully refilled**:
+A day whose logged bottles reached the daily goal (the current one, since days
+don't store their own). Refill counts these days since the beginning; missing a
+day never resets the count.
+_Avoid_: streak

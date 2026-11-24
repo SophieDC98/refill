@@ -21,6 +21,9 @@ nothing is fetched from other sites.
 - Shows the day's bottles in the morning, lunch and afternoon parts, drawn as
   pixel art. Tap a bottle to log the next one; tap a logged bottle to undo.
 - Shows "N of G" and the litres, and how many are left to go.
+- Counts the days you've been fully refilled, meaning you reached your goal,
+  since the beginning, for example "23 days fully refilled". Weekend days
+  count too, and a missed day never resets it.
 - Past the daily goal it adds an extra bottle, and a burst of stars marks
   reaching the goal.
 

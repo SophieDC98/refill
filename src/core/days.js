@@ -34,3 +34,14 @@ export function shade(count, bottleCl) {
 export function reachedGoal(before, after, goal) {
   return before < goal && after >= goal;
 }
+
+// How many days ever reached the goal, weekends included. Measured against the
+// current goal, since days don't store their own.
+export function daysAtGoal(days, goal) {
+  return Object.values(days).filter((n) => n >= goal).length;
+}
+
+export function daysAtGoalText(n) {
+  if (n === 0) return "Not fully refilled yet";
+  return `${n} ${n === 1 ? "day" : "days"} fully refilled`;
+}
